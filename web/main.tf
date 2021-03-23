@@ -1,5 +1,6 @@
 
 terraform {
+  region = "us-east-2"
   required_version = ">= 0.12.26"
 }
 
