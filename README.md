@@ -16,6 +16,30 @@ set -Ux AWS_ACCESS_KEY_ID <YOUR AWS_ACCESS_KEY_ID>
 set -Ux AWS_SECRET_ACCESS_KEY <YOUR AWS_SECRET_ACCESS_KEY>
 ```
 
+Create main.tf file
+```yaml
+module "webserver_cluster" {
+  source = "github.com/behoof4mind/tf-module-myservice?ref=0.1.1" #specify module version here
+  env_prefix        = "prod"
+  is_temp_env       = false
+  max_ec2_instances = 2
+  min_ec2_instances = 1
+  mysql_username    = "root"
+  mysql_password    = "mysqlpass"
+}
+
+```
+
+Make init
+```shell
+terraform init
+```
+
+Apply changes
+```shell
+terraform apply
+```
+
 ## Contributing
 
 Thanks for considering contributing! There’s information about how to [get started with Myservice module here](CONTRIBUTING.md).
