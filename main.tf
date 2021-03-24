@@ -1,29 +1,32 @@
 
+provider "aws" {}
+
 terraform {
-  region = "us-east-2"
   required_version = ">= 0.12.26"
 }
 
 data "aws_availability_zones" "all" {}
 
 resource "aws_autoscaling_group" "myservice" {
+  name                 = "myservice-${var.env_prefix}"
   launch_configuration = aws_launch_configuration.myservice.id
   availability_zones   = data.aws_availability_zones.all.names
 
-  min_size = 2
-  max_size = 10
+  min_size = "${var.max_ec2_instances}"
+  max_size = "${var.min_ec2_instances}"
 
   load_balancers    = [aws_elb.myservice.name]
   health_check_type = "ELB"
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg-example"
+    value               = "terraform-asg-myservice-${var.env_prefix}"
     propagate_at_launch = true
   }
 }
 
 resource "aws_launch_configuration" "myservice" {
+  name            = "myservice-${var.env_prefix}"
   image_id        = "ami-0c55b159cbfafe1f0"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.web-instance.id]
@@ -40,7 +43,7 @@ resource "aws_launch_configuration" "myservice" {
 }
 
 resource "aws_security_group" "web-instance" {
-  name = "terraform-myservice-instance"
+  name = "myservice-instance-${var.env_prefix}"
 
   ingress {
     from_port   = var.server_port
@@ -51,7 +54,7 @@ resource "aws_security_group" "web-instance" {
 }
 
 resource "aws_elb" "myservice" {
-  name               = "terraform-asg"
+  name               = "myservice-${var.env_prefix}"
   security_groups    = [aws_security_group.elb.id]
   availability_zones = data.aws_availability_zones.all.names
 
@@ -71,8 +74,21 @@ resource "aws_elb" "myservice" {
   }
 }
 
+resource "aws_db_instance" "myservice-db" {
+  allocated_storage    = 10
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.micro"
+  name                 = "myDB${var.env_prefix}"
+  username             = "${var.mysql_username}"
+  password             = "${var.mysql_password}"
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
+}
+
+
 resource "aws_security_group" "elb" {
-  name = "myservice-elb"
+  name = "myservice-${var.env_prefix}"
 
   egress {
     from_port   = 0
@@ -93,6 +109,6 @@ resource "aws_vpc" "web_vpc" {
   cidr_block = "172.16.0.0/16"
 
   tags = {
-    Name = "myservice"
+    Name = "myservice-${var.env_prefix}"
   }
 }
