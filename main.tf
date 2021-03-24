@@ -12,8 +12,8 @@ resource "aws_autoscaling_group" "myservice" {
   launch_configuration = aws_launch_configuration.myservice.id
   availability_zones   = data.aws_availability_zones.all.names
 
-  min_size = "${var.max_ec2_instances}"
-  max_size = "${var.min_ec2_instances}"
+  min_size = var.max_ec2_instances
+  max_size = var.min_ec2_instances
 
   load_balancers    = [aws_elb.myservice.name]
   health_check_type = "ELB"
@@ -80,8 +80,8 @@ resource "aws_db_instance" "myservice-db" {
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   name                 = "myDB${var.env_prefix}"
-  username             = "${var.mysql_username}"
-  password             = "${var.mysql_password}"
+  username             = var.mysql_username
+  password             = var.mysql_password
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
 }
