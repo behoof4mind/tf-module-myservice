@@ -104,7 +104,7 @@ resource "aws_db_instance" "myservice-db" {
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   name                 = "myDB${var.env_prefix}"
-  security_groups      = [aws_security_group.db-access.id]
+  security_group_names = [aws_security_group.db-access.name]
   username             = var.mysql_username
   password             = var.mysql_password
   parameter_group_name = "default.mysql5.7"
