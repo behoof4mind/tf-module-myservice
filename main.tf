@@ -37,12 +37,7 @@ resource "aws_launch_configuration" "myservice" {
   name          = "myservice-${var.env_prefix}"
   image_id      = "ami-08962a4068733a2b6"
   instance_type = "t2.micro"
-  security_groups = [
-    -aws_security_group.http-web-access.id
-    -aws_security_group.https-web-access.id
-    -aws_security_group.ssh-access.id
-    -aws_security_group.db-access.id
-  ]
+  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id, aws_security_group.db-access.id]
 
   user_data = <<-EOF
               #!/bin/bash
@@ -79,25 +74,6 @@ resource "aws_elb" "myservice" {
   }
 }
 
-
-resource "aws_security_group" "elb" {
-  name = "myservice-${var.env_prefix}"
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = var.elb_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_db_instance" "myservice-db" {
   allocated_storage    = 10
   engine               = "mysql"
@@ -108,5 +84,6 @@ resource "aws_db_instance" "myservice-db" {
   username             = var.mysql_username
   password             = var.mysql_password
   parameter_group_name = "default.mysql5.7"
+
   skip_final_snapshot  = true
 }

@@ -65,3 +65,22 @@ resource "aws_security_group" "db-access" {
     cidr_blocks = [aws_vpc.myservice_vpc.cidr_block]
   }
 }
+
+resource "aws_security_group" "elb" {
+  vpc_id = aws_vpc.myservice_vpc.id
+  name = "myservice-${var.env_prefix}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = var.elb_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
