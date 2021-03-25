@@ -27,7 +27,7 @@ variable "mysql_password" {
 
 variable "env_prefix" {
   description = "Environment prefix"
-  default = test
+  default = "test"
 }
 
 variable "is_temp_env" {
