@@ -33,7 +33,7 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-              nohup docker run -p ${var.server_port}:4000 -e DB_URL=${var.db_url} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
+cha              nohup docker run -p 80:${var.server_port} -e DB_URL=${var.db_url} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
               EOF
 
   lifecycle {
