@@ -34,16 +34,21 @@ resource "aws_autoscaling_group" "myservice" {
 }
 
 resource "aws_launch_configuration" "myservice" {
-  name            = "myservice-${var.env_prefix}"
-  image_id        = "ami-08962a4068733a2b6"
-  instance_type   = "t2.micro"
-  security_groups = [aws_security_group.web-instance.id]
+  name          = "myservice-${var.env_prefix}"
+  image_id      = "ami-08962a4068733a2b6"
+  instance_type = "t2.micro"
+  security_groups = [
+    -aws_security_group.http-web-access.id
+    -aws_security_group.https-web-access.id
+    -aws_security_group.ssh-access.id
+    -aws_security_group.db-access.id
+  ]
 
   user_data = <<-EOF
               #!/bin/bash
               apt update
-              apt  install docker.io -y
-              nohup docker run -p ${var.server_port}:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice &
+              apt install docker.io -y
+              nohup docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice &
               EOF
 
   lifecycle {
@@ -51,43 +56,7 @@ resource "aws_launch_configuration" "myservice" {
   }
 }
 
-resource "aws_security_group" "web-instance" {
-  name = "myservice-instance-${var.env_prefix}"
 
-  ingress {
-    from_port   = 80
-    to_port     = var.server_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port = 443
-    protocol = "tcp"
-    to_port = 443
-  }
-  egress {
-    from_port = 80
-    protocol = "tcp"
-    to_port = 80
-  }
-  egress {
-    from_port = var.server_port
-    protocol = "tcp"
-    to_port = 80
-  }
-}
 
 resource "aws_elb" "myservice" {
   name               = "myservice-${var.env_prefix}"
@@ -135,27 +104,9 @@ resource "aws_db_instance" "myservice-db" {
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   name                 = "myDB${var.env_prefix}"
-  security_groups    = [aws_security_group.db.id]
+  security_groups      = [aws_security_group.db-access.id]
   username             = var.mysql_username
   password             = var.mysql_password
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
-}
-
-resource "aws_security_group" "db" {
-  name = "myservice-${var.env_prefix}"
-
-  egress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.myservice_vpc.cidr_block]
-  }
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.myservice_vpc.cidr_block]
-  }
 }
