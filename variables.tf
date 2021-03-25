@@ -10,8 +10,29 @@ variable "elb_port" {
   default     = 80
 }
 
+variable "app_version" {
+  description = "Myservice application version"
+  default = "0.1.0"
+}
+
+variable "db_url" {
+  description = "Database instance URL `fqdn:port`"
+  default = "localhost:3306"
+}
+
+variable "mysql_username" {
+  description = "Mysql RDS username"
+  default = "root"
+}
+
+variable "mysql_password" {
+  description = "Mysql RDS user password"
+  default = "mysqlpass"
+}
+
 variable "env_prefix" {
   description = "Environment prefix"
+  default = test
 }
 
 variable "is_temp_env" {
@@ -31,12 +52,4 @@ variable "min_ec2_instances" {
   default     = 1
 }
 
-variable "mysql_username" {
-  description = "Mysql RDS username"
-  default = "root"
-}
 
-variable "mysql_password" {
-  description = "Mysql RDS user password"
-  default = "mysqlpass"
-}
