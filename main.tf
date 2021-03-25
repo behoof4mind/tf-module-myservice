@@ -26,7 +26,7 @@ resource "aws_autoscaling_group" "myservice" {
 
 resource "aws_launch_configuration" "myservice" {
   name          = "myservice-${var.env_prefix}"
-  image_id      = "ami-000e7ce4dd68e7a11"
+  image_id      = "ami-01e7ca2ef94a0ae86"
   instance_type = "t2.micro"
   // public ip should be turned off after tests
   associate_public_ip_address = true
@@ -34,7 +34,6 @@ resource "aws_launch_configuration" "myservice" {
   security_groups = [aws_security_group.elb.id]
 
   user_data = <<-REALEND
-              #!/bin/bash
               #!/bin/bash
               echo "started" >> /home/ubuntu/userdata.state
               sudo apt-get update
