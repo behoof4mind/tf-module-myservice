@@ -72,7 +72,7 @@ resource "aws_db_instance" "myservice-db" {
   engine               = "mysql"
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
-  db_subnet_group_name = aws_db_subnet_group.myservice.id
+  db_subnet_group_name = aws_db_subnet_group.myservice.name
   name                 = "myDB${var.env_prefix}"
   username             = var.mysql_username
   password             = var.mysql_password
