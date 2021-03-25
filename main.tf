@@ -16,7 +16,7 @@ resource "aws_vpc" "myservice_vpc" {
 resource "aws_subnet" "myservice_a" {
   vpc_id     = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2a"
-  cidr_block = "172.16.1.0/24"
+  cidr_block = "172.16.10.0/24"
 
   tags = {
     Name = "Main"
@@ -26,7 +26,7 @@ resource "aws_subnet" "myservice_a" {
 resource "aws_subnet" "myservice_b" {
   vpc_id     = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2b"
-  cidr_block = "172.16.2.0/24"
+  cidr_block = "172.16.20.0/24"
 
   tags = {
     Name = "Main"
