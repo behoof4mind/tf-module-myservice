@@ -8,8 +8,8 @@ terraform {
 resource "aws_autoscaling_group" "myservice" {
   name                 = "myservice-${var.env_prefix}"
   launch_configuration = aws_launch_configuration.myservice.id
-//  availability_zones   = data.aws_availability_zones.all.names
-  vpc_zone_identifier  = [aws_subnet.myservice_a.id, aws_subnet.myservice_b.id, aws_subnet.myservice_c.id]
+  //  availability_zones   = data.aws_availability_zones.all.names
+  vpc_zone_identifier = [aws_subnet.myservice_a.id, aws_subnet.myservice_b.id, aws_subnet.myservice_c.id]
 
   min_size = var.max_ec2_instances
   max_size = var.min_ec2_instances
@@ -30,7 +30,7 @@ resource "aws_launch_configuration" "myservice" {
   instance_type = "t2.micro"
   // public ip should be turned off after tests
   associate_public_ip_address = true
-//  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
+  //  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
   security_groups = [aws_security_group.elb.id]
 
   user_data = <<-EOF
@@ -46,10 +46,10 @@ resource "aws_launch_configuration" "myservice" {
 }
 
 resource "aws_elb" "myservice" {
-  name               = "myservice-${var.env_prefix}"
-  security_groups    = [aws_security_group.elb.id]
-//  availability_zones = data.aws_availability_zones.all.names
-  subnets            = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
+  name            = "myservice-${var.env_prefix}"
+  security_groups = [aws_security_group.elb.id]
+  //  availability_zones = data.aws_availability_zones.all.names
+  subnets = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
   health_check {
     target              = "HTTP:${var.elb_port}/"
@@ -68,15 +68,15 @@ resource "aws_elb" "myservice" {
 }
 
 resource "aws_db_instance" "myservice-db" {
-  allocated_storage    = 10
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t3.micro"
-  db_subnet_group_name = aws_db_subnet_group.myservice.name
-  name                 = "myDB${var.env_prefix}"
-  username             = var.mysql_username
-  password             = var.mysql_password
-  parameter_group_name = "default.mysql5.7"
-
-  skip_final_snapshot  = true
+  allocated_storage      = 10
+  engine                 = "mysql"
+  engine_version         = "5.7"
+  instance_class         = "db.t3.micro"
+  db_subnet_group_name   = aws_db_subnet_group.myservice.name
+  name                   = "myDB${var.env_prefix}"
+  username               = var.mysql_username
+  password               = var.mysql_password
+  parameter_group_name   = "default.mysql5.7"
+  vpc_security_group_ids = [aws_security_group.elb.id]
+  skip_final_snapshot    = true
 }
