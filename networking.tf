@@ -28,6 +28,26 @@ resource "aws_route_table" "r" {
   }
 }
 
+resource "aws_route_table_association" "a1" {
+  subnet_id      = aws_subnet.myservice_a.id
+  route_table_id = aws_route_table.r.id
+}
+
+resource "aws_route_table_association" "a2" {
+  subnet_id      = aws_subnet.myservice_b.id
+  route_table_id = aws_route_table.r.id
+}
+
+resource "aws_route_table_association" "a3" {
+  subnet_id      = aws_subnet.myservice_c.id
+  route_table_id = aws_route_table.r.id
+}
+
+resource "aws_main_route_table_association" "a" {
+  vpc_id         = aws_vpc.myservice_vpc.id
+  route_table_id = aws_route_table.r.id
+}
+
 resource "aws_subnet" "myservice_a" {
   vpc_id     = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2a"
@@ -55,6 +75,15 @@ resource "aws_subnet" "myservice_c" {
 
   tags = {
     Name = "myservice-${var.env_prefix}-c"
+  }
+}
+
+resource "aws_db_subnet_group" "myservice" {
+  name       = "myservice-rds-subnet-group"
+  subnet_ids = [aws_subnet.myservice_a.id, aws_subnet.myservice_b.id, aws_subnet.myservice_c.id]
+
+  tags = {
+    Name = "myservice DB subnet group"
   }
 }
 
