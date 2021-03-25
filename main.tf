@@ -27,7 +27,7 @@ resource "aws_autoscaling_group" "myservice" {
 
 resource "aws_launch_configuration" "myservice" {
   name            = "myservice-${var.env_prefix}"
-  image_id        = "ami-0c55b159cbfafe1f0"
+  image_id        = "ami-08962a4068733a2b6"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.web-instance.id]
 
