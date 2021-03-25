@@ -28,6 +28,7 @@ resource "aws_launch_configuration" "myservice" {
   name          = "myservice-${var.env_prefix}"
   image_id      = "ami-08962a4068733a2b6"
   instance_type = "t2.micro"
+  // public ip should be turned off after tests
   associate_public_ip_address = true
   security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
 
