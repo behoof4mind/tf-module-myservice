@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "myservice" {
 }
 
 resource "aws_launch_configuration" "myservice" {
-  name          = "myservice-${var.env_prefix}"
+  name_prefix   = "myservice-${var.env_prefix}"
   image_id      = "ami-01e7ca2ef94a0ae86"
   instance_type = "t2.micro"
   // public ip should be turned off after tests
