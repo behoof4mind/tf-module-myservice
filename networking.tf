@@ -1,6 +1,6 @@
 resource "aws_vpc" "myservice_vpc" {
-  cidr_block = "172.16.0.0/16"
-  enable_dns_support   = true
+  cidr_block         = "172.16.0.0/16"
+  enable_dns_support = true
 
   tags = {
     Name = "myservice-${var.env_prefix}"
@@ -44,7 +44,7 @@ resource "aws_route_table_association" "a3" {
 }
 
 resource "aws_route_table_association" "agw" {
-  subnet_id      = aws_internet_gateway.gw.id
+  gateway_id     = aws_internet_gateway.gw.id
   route_table_id = aws_route_table.r.id
 }
 
@@ -54,9 +54,9 @@ resource "aws_main_route_table_association" "a" {
 }
 
 resource "aws_subnet" "myservice_a" {
-  vpc_id     = aws_vpc.myservice_vpc.id
+  vpc_id            = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2a"
-  cidr_block = "172.16.10.0/24"
+  cidr_block        = "172.16.10.0/24"
 
   tags = {
     Name = "myservice-${var.env_prefix}-a"
@@ -64,9 +64,9 @@ resource "aws_subnet" "myservice_a" {
 }
 
 resource "aws_subnet" "myservice_b" {
-  vpc_id     = aws_vpc.myservice_vpc.id
+  vpc_id            = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2b"
-  cidr_block = "172.16.20.0/24"
+  cidr_block        = "172.16.20.0/24"
 
   tags = {
     Name = "myservice-${var.env_prefix}-b"
@@ -74,9 +74,9 @@ resource "aws_subnet" "myservice_b" {
 }
 
 resource "aws_subnet" "myservice_c" {
-  vpc_id     = aws_vpc.myservice_vpc.id
+  vpc_id            = aws_vpc.myservice_vpc.id
   availability_zone = "us-east-2c"
-  cidr_block = "172.16.3.0/24"
+  cidr_block        = "172.16.3.0/24"
 
   tags = {
     Name = "myservice-${var.env_prefix}-c"
