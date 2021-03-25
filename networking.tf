@@ -1,5 +1,6 @@
 resource "aws_vpc" "myservice_vpc" {
   cidr_block = "172.16.0.0/16"
+  enable_dns_support   = true
 
   tags = {
     Name = "myservice-${var.env_prefix}"
