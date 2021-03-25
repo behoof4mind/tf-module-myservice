@@ -5,46 +5,6 @@ terraform {
   required_version = ">= 0.12.26"
 }
 
-resource "aws_vpc" "myservice_vpc" {
-  cidr_block = "172.16.0.0/16"
-
-  tags = {
-    Name = "myservice-${var.env_prefix}"
-  }
-}
-
-resource "aws_subnet" "myservice_a" {
-  vpc_id     = aws_vpc.myservice_vpc.id
-  availability_zone = "us-east-2a"
-  cidr_block = "172.16.10.0/24"
-
-  tags = {
-    Name = "myservice-${var.env_prefix}-a"
-  }
-}
-
-resource "aws_subnet" "myservice_b" {
-  vpc_id     = aws_vpc.myservice_vpc.id
-  availability_zone = "us-east-2b"
-  cidr_block = "172.16.20.0/24"
-
-  tags = {
-    Name = "myservice-${var.env_prefix}-b"
-  }
-}
-
-resource "aws_subnet" "myservice_c" {
-  vpc_id     = aws_vpc.myservice_vpc.id
-  availability_zone = "us-east-2c"
-  cidr_block = "172.16.3.0/24"
-
-  tags = {
-    Name = "myservice-${var.env_prefix}-c"
-  }
-}
-
-data "aws_availability_zones" "all" {}
-
 resource "aws_autoscaling_group" "myservice" {
   name                 = "myservice-${var.env_prefix}"
   launch_configuration = aws_launch_configuration.myservice.id
