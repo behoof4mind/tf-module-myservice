@@ -51,7 +51,7 @@ resource "aws_elb" "myservice" {
   subnets            = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
   health_check {
-    target              = "HTTP:${var.server_port}/"
+    target              = "HTTP:${var.elb_port}/"
     interval            = 30
     timeout             = 10
     healthy_threshold   = 2
