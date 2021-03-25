@@ -31,7 +31,7 @@ resource "aws_launch_configuration" "myservice" {
   // public ip should be turned off after tests
   associate_public_ip_address = true
 //  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
-  security_groups = [aws_security_group.elb]
+  security_groups = [aws_security_group.elb.id]
 
   user_data = <<-EOF
               #!/bin/bash
