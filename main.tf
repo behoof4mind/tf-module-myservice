@@ -35,9 +35,10 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt-get update -y && apt-get install -y docker.io
+              apt-get update -y && apt-get install -y mysql-client && apt-get install -y docker.io
+              mysql -h ${aws_db_instance.myservice-db.endpoint} -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice"
               systemctl enable docker
-              docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice &
+              docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice
               EOF
 
   lifecycle {
@@ -52,7 +53,7 @@ resource "aws_elb" "myservice" {
   subnets = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
   health_check {
-    target              = "HTTP:${var.elb_port}/"
+    target              = "HTTP:80/"
     interval            = 30
     timeout             = 10
     healthy_threshold   = 2
@@ -62,7 +63,7 @@ resource "aws_elb" "myservice" {
   listener {
     lb_port           = 80
     lb_protocol       = "http"
-    instance_port     = var.server_port
+    instance_port     = 80
     instance_protocol = "http"
   }
 }
