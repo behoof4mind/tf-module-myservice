@@ -43,10 +43,10 @@ resource "aws_route_table_association" "a3" {
   route_table_id = aws_route_table.r.id
 }
 
-resource "aws_route_table_association" "agw" {
-  gateway_id     = aws_internet_gateway.gw.id
-  route_table_id = aws_route_table.r.id
-}
+//resource "aws_route_table_association" "adb" {
+//  subnet_id     = aws_internet_gateway.gw.id
+//  route_table_id = aws_route_table.r.id
+//}
 
 resource "aws_main_route_table_association" "a" {
   vpc_id         = aws_vpc.myservice_vpc.id
