@@ -1,4 +1,5 @@
 resource "aws_security_group" "http-web-access" {
+  vpc_id = aws_vpc.myservice_vpc.id
   name = "myservice-http-${var.env_prefix}"
 
   ingress {
@@ -16,6 +17,7 @@ resource "aws_security_group" "http-web-access" {
 }
 
 resource "aws_security_group" "https-web-access" {
+  vpc_id = aws_vpc.myservice_vpc.id
   name = "myservice-https-${var.env_prefix}"
 
   ingress {
@@ -32,6 +34,7 @@ resource "aws_security_group" "https-web-access" {
 }
 
 resource "aws_security_group" "ssh-access" {
+  vpc_id = aws_vpc.myservice_vpc.id
   name = "myservice-ssh-${var.env_prefix}"
   ingress {
     from_port   = 22
@@ -47,6 +50,7 @@ resource "aws_security_group" "ssh-access" {
 }
 
 resource "aws_security_group" "db-access" {
+  vpc_id = aws_vpc.myservice_vpc.id
   name = "myservice-db-${var.env_prefix}"
   ingress {
     from_port   = 3306
