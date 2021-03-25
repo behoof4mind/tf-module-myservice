@@ -15,11 +15,6 @@ variable "app_version" {
   default = "0.1.0"
 }
 
-variable "db_url" {
-  description = "Database instance URL `fqdn:port`"
-  default = "localhost:3306"
-}
-
 variable "mysql_username" {
   description = "Mysql RDS username"
   default = "root"

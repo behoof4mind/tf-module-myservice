@@ -33,12 +33,13 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-cha              nohup docker run -p 80:${var.server_port} -e DB_URL=${var.db_url} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
+              nohup docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
               EOF
 
   lifecycle {
     create_before_destroy = true
   }
+  depends_on = [aws_db_instance.myservice-db]
 }
 
 resource "aws_security_group" "web-instance" {
@@ -72,6 +73,19 @@ resource "aws_elb" "myservice" {
     instance_protocol = "http"
   }
 }
+
+resource "aws_db_instance" "myservice-db" {
+  allocated_storage    = 10
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.micro"
+  name                 = "myDB${var.env_prefix}"
+  username             = var.mysql_username
+  password             = var.mysql_password
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
+}
+
 
 resource "aws_security_group" "elb" {
   name = "myservice-${var.env_prefix}"
