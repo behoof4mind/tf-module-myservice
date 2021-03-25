@@ -33,7 +33,7 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-              nohup docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
+              nohup docker run -p ${var.server_port}:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
               EOF
 
   lifecycle {
@@ -48,6 +48,12 @@ resource "aws_security_group" "web-instance" {
   ingress {
     from_port   = var.server_port
     to_port     = var.server_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
