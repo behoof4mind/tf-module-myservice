@@ -26,7 +26,7 @@ resource "aws_autoscaling_group" "myservice" {
 
 resource "aws_launch_configuration" "myservice" {
   name          = "myservice-${var.env_prefix}"
-  image_id      = "ami-08962a4068733a2b6"
+  image_id      = "ami-000e7ce4dd68e7a11"
   instance_type = "t2.micro"
   // public ip should be turned off after tests
   associate_public_ip_address = true
@@ -35,10 +35,30 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt-get update -y && apt-get install -y mysql-client && apt-get install -y docker.io
+              sudo apt-get update
+              sudo apt-get install -y docker.io
+              sudo apt install mysql-client
               mysql -h ${aws_db_instance.myservice-db.endpoint} -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice"
-              systemctl enable docker
-              docker run -p 80:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice
+
+              usermod -aG docker ubuntu
+
+              sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+
+              sudo usermod -aG docker $USER
+
+              cat <<EOF >/home/ubuntu/docker-compose.yml
+              myservice:
+                image: behoof4mind/myservice:${var.app_version}
+                ports:
+                  - "80:${var.server_port}"
+                environment:
+                - DB_URL=${aws_db_instance.myservice-db.endpoint}
+                - DB_USERNAME=${var.mysql_username}
+                - DB_PASSWORD=${var.mysql_password}
+              EOF
+              sudo chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
+              sudo docker-compose up -d
               EOF
 
   lifecycle {
