@@ -13,6 +13,36 @@ resource "aws_vpc" "myservice_vpc" {
   }
 }
 
+resource "aws_subnet" "myservice_a" {
+  vpc_id     = aws_vpc.myservice_vpc.id
+  availability_zone = "us-east-2a"
+  cidr_block = "172.16.1.0/24"
+
+  tags = {
+    Name = "Main"
+  }
+}
+
+resource "aws_subnet" "myservice_b" {
+  vpc_id     = aws_vpc.myservice_vpc.id
+  availability_zone = "us-east-2b"
+  cidr_block = "172.16.2.0/24"
+
+  tags = {
+    Name = "Main"
+  }
+}
+
+resource "aws_subnet" "myservice_c" {
+  vpc_id     = aws_vpc.myservice_vpc.id
+  availability_zone = "us-east-2c"
+  cidr_block = "172.16.3.0/24"
+
+  tags = {
+    Name = "Main"
+  }
+}
+
 data "aws_availability_zones" "all" {}
 
 resource "aws_autoscaling_group" "myservice" {
