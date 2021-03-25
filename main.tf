@@ -48,7 +48,7 @@ data "aws_availability_zones" "all" {}
 resource "aws_autoscaling_group" "myservice" {
   name                 = "myservice-${var.env_prefix}"
   launch_configuration = aws_launch_configuration.myservice.id
-  availability_zones   = data.aws_availability_zones.all.names
+//  availability_zones   = data.aws_availability_zones.all.names
   vpc_zone_identifier  = [aws_subnet.myservice_a.id, aws_subnet.myservice_b.id, aws_subnet.myservice_c.id]
 
   min_size = var.max_ec2_instances
