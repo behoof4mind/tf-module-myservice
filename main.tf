@@ -37,7 +37,7 @@ resource "aws_launch_configuration" "myservice" {
   name          = "myservice-${var.env_prefix}"
   image_id      = "ami-08962a4068733a2b6"
   instance_type = "t2.micro"
-  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id, aws_security_group.db-access.id]
+  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
 
   user_data = <<-EOF
               #!/bin/bash
