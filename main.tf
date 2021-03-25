@@ -19,7 +19,7 @@ resource "aws_subnet" "myservice_a" {
   cidr_block = "172.16.10.0/24"
 
   tags = {
-    Name = "Main"
+    Name = "myservice-${var.env_prefix}-a"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_subnet" "myservice_b" {
   cidr_block = "172.16.20.0/24"
 
   tags = {
-    Name = "Main"
+    Name = "myservice-${var.env_prefix}-b"
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_subnet" "myservice_c" {
   cidr_block = "172.16.3.0/24"
 
   tags = {
-    Name = "Main"
+    Name = "myservice-${var.env_prefix}-c"
   }
 }
 
@@ -49,6 +49,7 @@ resource "aws_autoscaling_group" "myservice" {
   name                 = "myservice-${var.env_prefix}"
   launch_configuration = aws_launch_configuration.myservice.id
   availability_zones   = data.aws_availability_zones.all.names
+  vpc_zone_identifier  = [aws_subnet.myservice_a.id, aws_subnet.myservice_b.id, aws_subnet.myservice_c.id]
 
   min_size = var.max_ec2_instances
   max_size = var.min_ec2_instances
