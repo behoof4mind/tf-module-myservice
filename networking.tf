@@ -44,7 +44,7 @@ resource "aws_route_table_association" "a3" {
 }
 
 resource "aws_route_table_association" "agw" {
-  subnet_id      = aws_subnet.myservice_c.id
+  subnet_id      = aws_internet_gateway.gw.id
   route_table_id = aws_route_table.r.id
 }
 
