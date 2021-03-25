@@ -5,6 +5,14 @@ terraform {
   required_version = ">= 0.12.26"
 }
 
+resource "aws_vpc" "myservice_vpc" {
+  cidr_block = "172.16.0.0/16"
+
+  tags = {
+    Name = "myservice-${var.env_prefix}"
+  }
+}
+
 data "aws_availability_zones" "all" {}
 
 resource "aws_autoscaling_group" "myservice" {
@@ -33,20 +41,21 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-EOF
               #!/bin/bash
-              nohup docker run -p ${var.server_port}:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} &
+              apt update
+              apt  install docker.io -y
+              nohup docker run -p ${var.server_port}:${var.server_port} -e DB_URL=${aws_db_instance.myservice-db.endpoint} -e DB_USERNAME=${var.mysql_username} -e DB_PASSWORD=${var.mysql_password} behoof4mind/myservice:${var.app_version} myservice &
               EOF
 
   lifecycle {
     create_before_destroy = true
   }
-  depends_on = [aws_db_instance.myservice-db]
 }
 
 resource "aws_security_group" "web-instance" {
   name = "myservice-instance-${var.env_prefix}"
 
   ingress {
-    from_port   = var.server_port
+    from_port   = 80
     to_port     = var.server_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
@@ -56,6 +65,27 @@ resource "aws_security_group" "web-instance" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port = 443
+    protocol = "tcp"
+    to_port = 443
+  }
+  egress {
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+  }
+  egress {
+    from_port = var.server_port
+    protocol = "tcp"
+    to_port = 80
   }
 }
 
@@ -67,29 +97,17 @@ resource "aws_elb" "myservice" {
   health_check {
     target              = "HTTP:${var.server_port}/"
     interval            = 30
-    timeout             = 3
+    timeout             = 10
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
 
   listener {
-    lb_port           = var.elb_port
+    lb_port           = 80
     lb_protocol       = "http"
     instance_port     = var.server_port
     instance_protocol = "http"
   }
-}
-
-resource "aws_db_instance" "myservice-db" {
-  allocated_storage    = 10
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t3.micro"
-  name                 = "myDB${var.env_prefix}"
-  username             = var.mysql_username
-  password             = var.mysql_password
-  parameter_group_name = "default.mysql5.7"
-  skip_final_snapshot  = true
 }
 
 
@@ -104,17 +122,40 @@ resource "aws_security_group" "elb" {
   }
 
   ingress {
-    from_port   = var.elb_port
+    from_port   = 80
     to_port     = var.elb_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_vpc" "web_vpc" {
-  cidr_block = "172.16.0.0/16"
+resource "aws_db_instance" "myservice-db" {
+  allocated_storage    = 10
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.micro"
+  name                 = "myDB${var.env_prefix}"
+  security_groups    = [aws_security_group.db.id]
+  username             = var.mysql_username
+  password             = var.mysql_password
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
+}
 
-  tags = {
-    Name = "myservice-${var.env_prefix}"
+resource "aws_security_group" "db" {
+  name = "myservice-${var.env_prefix}"
+
+  egress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.myservice_vpc.cidr_block]
+  }
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.myservice_vpc.cidr_block]
   }
 }
