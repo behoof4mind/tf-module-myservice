@@ -33,8 +33,10 @@ resource "aws_launch_configuration" "myservice" {
   //  security_groups = [aws_security_group.http-web-access.id, aws_security_group.https-web-access.id, aws_security_group.ssh-access.id,aws_security_group.db-access.id]
   security_groups = [aws_security_group.elb.id]
 
-  user_data = <<-EOF
+  user_data = <<-REALEND
               #!/bin/bash
+              #!/bin/bash
+              echo "started" >> /home/ubuntu/userdata.state
               sudo apt-get update
               sudo apt-get install -y docker.io
               sudo apt install mysql-client
@@ -51,15 +53,13 @@ resource "aws_launch_configuration" "myservice" {
               myservice:
                 image: behoof4mind/myservice:${var.app_version}
                 ports:
-                  - "80:${var.server_port}"
-                environment:
-                - DB_URL=${aws_db_instance.myservice-db.endpoint}
-                - DB_USERNAME=${var.mysql_username}
-                - DB_PASSWORD=${var.mysql_password}
+                  - "80:4000"
               EOF
+
               sudo chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
               sudo docker-compose up -d
-              EOF
+              echo "finished" >> /home/ubuntu/userdata.state
+              REALEND
 
   lifecycle {
     create_before_destroy = true
