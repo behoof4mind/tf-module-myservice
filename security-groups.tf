@@ -67,7 +67,8 @@ resource "aws_security_group" "db-access" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "myservice-${var.env_prefix}"
+  vpc_id = aws_vpc.myservice_vpc.id
+  name = "myservice-elb-${var.env_prefix}"
 
   egress {
     from_port   = 0
