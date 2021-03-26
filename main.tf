@@ -72,13 +72,13 @@ resource "aws_elb" "myservice" {
   //  availability_zones = data.aws_availability_zones.all.names
   subnets = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
-  health_check {
-    target              = "HTTP:80/"
-    interval            = 30
-    timeout             = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
+//  health_check {
+//    target              = "HTTP:80/"
+//    interval            = 30
+//    timeout             = 10
+//    healthy_threshold   = 2
+//    unhealthy_threshold = 2
+//  }
 
   listener {
     lb_port           = 80
