@@ -72,7 +72,6 @@ resource "aws_launch_configuration" "myservice" {
 resource "aws_elb" "myservice" {
   name            = "myservice-${var.env_prefix}"
   security_groups = [aws_security_group.elb.id]
-  //  availability_zones = data.aws_availability_zones.all.names
   subnets = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
     health_check {
