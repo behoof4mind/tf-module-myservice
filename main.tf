@@ -51,9 +51,9 @@ resource "aws_launch_configuration" "myservice" {
 
               cat <<EOF >/home/ubuntu/docker-compose.yml
               myservice:
-                image: behoof4mind/myservice:test
+                image: behoof4mind/myservice:${var.app_version}
                 ports:
-                  - "80:4000"
+                  - "80:${var.server_port}"
                 environment:
                   - DB_URL=${aws_db_instance.myservice-db.endpoint}
                   - DB_USERNAME=${var.mysql_username}
@@ -84,7 +84,7 @@ resource "aws_elb" "myservice" {
     }
 
   listener {
-    lb_port           = 80
+    lb_port           = var.elb_port
     lb_protocol       = "http"
     instance_port     = 80
     instance_protocol = "http"
