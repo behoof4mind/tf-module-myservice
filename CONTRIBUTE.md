@@ -62,14 +62,5 @@ After you’ve opened your pull request, [you should email me](mailto:dlavrushko
 
 ## Adding new features
 
-Thinking of adding a new feature? Cool! [Open an issue](https://github.com/kennethormandy/default/issues) and let’s design it together.
+Thinking of adding a new feature? Cool! [Open an issue](https://github.com/behoof4mind/tf-module-myservice/issues) and let’s design it together.
 
-## Contribute
-#### Issue
-Create and issue and describe changes
-
-#### Follow guidelines
-[Terraform Recommended Practices](https://www.terraform.io/docs/cloud/guides/recommended-practices/index.html)
-
-#### 
-Create and 
