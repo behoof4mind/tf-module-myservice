@@ -41,20 +41,24 @@ resource "aws_launch_configuration" "myservice" {
               sudo apt-get install -y docker.io
               sudo apt install -y mysql-client
               rds_endpoint=$(echo ${aws_db_instance.myservice-db.endpoint} | cut -f1 -d":")
-              mysql -h $rds_endpoint -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice"
+              mysql -h $rds_endpoint -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice;"
 
               usermod -aG docker ubuntu
 
-              sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+              sudo curl -L "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
 
               sudo usermod -aG docker $USER
 
               cat <<EOF >/home/ubuntu/docker-compose.yml
               myservice:
-                image: behoof4mind/myservice:${var.app_version}
+                image: behoof4mind/myservice:test
                 ports:
                   - "80:4000"
+                environment:
+                  - DB_URL=${aws_db_instance.myservice-db.endpoint}
+                  - DB_USERNAME=${var.mysql_username}
+                  - DB_PASSWORD=${var.mysql_password}
               EOF
 
               sudo chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
@@ -73,13 +77,13 @@ resource "aws_elb" "myservice" {
   //  availability_zones = data.aws_availability_zones.all.names
   subnets = [aws_subnet.myservice_c.id, aws_subnet.myservice_b.id, aws_subnet.myservice_a.id]
 
-  //  health_check {
-  //    target              = "HTTP:80/"
-  //    interval            = 30
-  //    timeout             = 10
-  //    healthy_threshold   = 2
-  //    unhealthy_threshold = 2
-  //  }
+    health_check {
+      target              = "HTTP:80/"
+      interval            = 30
+      timeout             = 10
+      healthy_threshold   = 2
+      unhealthy_threshold = 2
+    }
 
   listener {
     lb_port           = 80
