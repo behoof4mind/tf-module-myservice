@@ -51,7 +51,7 @@ resource "aws_launch_configuration" "myservice" {
 
               cat <<EOF >/home/ubuntu/docker-compose.yml
               myservice:
-                image: behoof4mind/myservice:${var.app_version}
+                image: behoof4mind/myservice:${var.app_version}-${var.env_prefix}
                 ports:
                   - "80:${var.server_port}"
                 environment:
