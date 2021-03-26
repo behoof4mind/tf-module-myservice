@@ -38,8 +38,9 @@ resource "aws_launch_configuration" "myservice" {
               echo "started" >> /home/ubuntu/userdata.state
               sudo apt-get update
               sudo apt-get install -y docker.io
-              sudo apt install mysql-client
-              mysql -h ${aws_db_instance.myservice-db.endpoint} -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice"
+              sudo apt install -y mysql-client
+              rds_endpoint=$(echo ${aws_db_instance.myservice-db.endpoint} | cut -f1 -d":")
+              mysql -h $rds_endpoint -u ${var.mysql_username} -p${var.mysql_password} -e "create database if not exists myservice"
 
               usermod -aG docker ubuntu
 
