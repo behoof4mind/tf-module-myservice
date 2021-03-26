@@ -36,7 +36,6 @@ resource "aws_launch_configuration" "myservice" {
 
   user_data = <<-REALEND
               #!/bin/bash
-              echo "started" >> /home/ubuntu/userdata.state
               sudo apt-get update
               sudo apt-get install -y docker.io
               sudo apt install -y mysql-client
@@ -62,8 +61,7 @@ resource "aws_launch_configuration" "myservice" {
               EOF
 
               sudo chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
-              sudo docker-compose up -d
-              echo "finished" >> /home/ubuntu/userdata.state
+              sudo /usr/local/bin/docker-compose -f /home/ubuntu/docker-compose.yml up -d
               REALEND
 
   lifecycle {
